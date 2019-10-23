@@ -1,3 +1,5 @@
+######## Pre-requistes ##########
+
 - name: yum-clean-all
   command: yum clean all
   args:
@@ -58,7 +60,6 @@
   args:
     removes: /sys/kernel/mm/transparent_hugepage/enabled
 
-
 - name: Install epel
   yum:
     name: epel-release
@@ -69,7 +70,7 @@
   selinux:
     state: disabled
 
-- name: Check is umask Value exists
+- name: Check if umask Value exists
   command: grep "umask 0022" /etc/profile
   register: umask
   always_run: True
@@ -79,6 +80,8 @@
 - name: Updating umask Value
   shell: echo umask 0022 >> /etc/profile
   when: umask.rc != 0
+
+######### Setup Hadoop ##############
 
 - name: Install OpenJDK-1.8
   yum:
@@ -96,11 +99,63 @@
 - name: Unarchive Hadoop
   unarchive:
     src: /tmp/hadoop-3.2.1.tar.gz
-    dest: /etc/
+    dest: /usr/
     remote_src: yes
 
-- name: Set to the root of your Java installation
+- name: Setup Hadoop Enviornment Variables
   blockinfile:
-    path: /etc/hadoop/hadoop-env.sh
+    path: /usr/hadoop-3.2.1/etc/hadoop/hadoop-env.sh
     block: |
-      export JAVA_HOME=/usr/lib/jvm/java-1.8.0-openjdk-1.8.0.191.b12-1.el7_6.x86_64
+      export JAVA_HOME=/etc/alternatives/jre_openjdk
+      export HDFS_NAMENODE_USER="root"
+      export HDFS_DATANODE_USER="root"
+      export HDFS_SECONDARYNAMENODE_USER="root"
+      export YARN_RESOURCEMANAGER_USER="root"
+      export YARN_NODEMANAGER_USER="root"
+
+- name: Create Hadoop Env File
+  file:
+    state: touch
+    path: /etc/profile.d/hadoop.sh
+
+- name: Setup Hadoop bin Path
+  blockinfile:
+    path: /etc/profile.d/hadoop.sh
+    block: |
+      export PATH="$PATH:/usr/hadoop-3.2.1/bin/"
+
+- name: Format Namenode
+  shell: |
+    ssh-keygen -t rsa -P '' -f ~/.ssh/id_rsa
+    cat ~/.ssh/id_rsa.pub >> ~/.ssh/authorized_keys
+    chmod 0600 ~/.ssh/authorized_keys
+
+- name: Update Core Site
+  xml:
+    path: /usr/hadoop-3.2.1/etc/hadoop/core-site.xml
+    xpath: /configuration/property
+    attribute: fs.defaultFS
+    value: hdfs://localhost:9000
+
+- name: Update HDFS Site
+  xml:
+    path: /usr/hadoop-3.2.1/etc/hadoop/hdfs-site.xml
+    xpath: /configuration/property
+    attribute: dfs.replication
+    value: '1'
+
+- name: Format Namenode
+  shell: /usr/hadoop-3.2.1/bin/hdfs namenode -format
+
+
+######## Setup Hadoop Servcies ##############
+
+
+chmod +x /etc/init.d/hadoop
+chkconfig --add hadoop
+service hadoop start
+
+
+
+# - name: Start HDFS
+#   shell: /usr/hadoop-3.2.1/sbin/start-dfs.sh
