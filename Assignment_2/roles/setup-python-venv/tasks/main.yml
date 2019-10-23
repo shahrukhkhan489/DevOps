@@ -1,31 +1,22 @@
-######## Pre-requistes ##########
 
-- name: Install Python
+- name: Install Python and Pip
   yum:
-    name: ntp
+    name: {{item}}
     state: installed
-  ignore_errors: true
+  with_items:
+   - python3
+   - python3-pip
 
 - name: Install Python Virtual Enviornment Package
-  shell: pip install virtualenv
+  shell: pip3 install virtualenv
 
-######## Setup Hadoop Service Handler ##############
+- name: Copy Python Package Requirement
+  copy: src=requirement.txt dest=/tmp/requirement.txt
 
-- name: Copy Service Handler Scripts
-  copy: src={{item}} dest=/etc/init.d/{{item}}
-  with_items:
-    - hadoop
-    - hdfs
-    - yarn
-
-- name: Enable Service Handler Script
+- name: Setting up Virtual Env and Installing Packages
   shell: |
-    chmod +x /etc/init.d/{{item}}
-    chkconfig --add {{item}}
-  with_items:
-    - hadoop
-    - hdfs
-    - yarn
-
-- name: Start Hadoop
-  shell: service hadoop start
+    mkdir /tmp/asg2_virtualenv
+    cd /tmp/asg2_virtualenv
+    virtualenv venv
+    source venv/bin/activate
+    for i in `cat /tmp/requirement.txt`; do pip install $i; done
