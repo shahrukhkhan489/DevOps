@@ -1,0 +1,6 @@
+
+- hosts: localhost
+  become: true
+  roles:
+      - setup-python-venv
+  gather_facts: no
