@@ -154,8 +154,3 @@
 chmod +x /etc/init.d/hadoop
 chkconfig --add hadoop
 service hadoop start
-
-
-
-# - name: Start HDFS
-#   shell: /usr/hadoop-3.2.1/sbin/start-dfs.sh

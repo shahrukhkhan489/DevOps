@@ -1,0 +1,21 @@
+
+######## Setup Hadoop Service Handler ##############
+
+- name: Copy Service Handler Scripts
+  copy: src={{item}} dest=/etc/init.d/{{item}}
+  with_items:
+    - hadoop
+    - hdfs
+    - yarn
+
+- name: Enable Service Handler Script
+  shell: |
+    chmod +x /etc/init.d/{{item}}
+    chkconfig --add {{item}}
+  with_items:
+    - hadoop
+    - hdfs
+    - yarn
+
+- name: Start Hadoop
+  shell: service hadoop start
