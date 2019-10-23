@@ -146,11 +146,3 @@
 
 - name: Format Namenode
   shell: /usr/hadoop-3.2.1/bin/hdfs namenode -format
-
-
-######## Setup Hadoop Servcies ##############
-
-
-chmod +x /etc/init.d/hadoop
-chkconfig --add hadoop
-service hadoop start
