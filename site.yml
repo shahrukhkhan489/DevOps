@@ -1,0 +1,6 @@
+
+- hosts: localhost
+  become: true
+  roles:
+      - setup-hadoop
+  gather_facts: no
