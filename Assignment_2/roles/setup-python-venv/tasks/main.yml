@@ -1,7 +1,7 @@
 
-- name: Install Python and Pip
+- name: Install Python, Pip, and Zip
   yum:
-    name: {{item}}
+    name: "{{ item }}"
     state: installed
   with_items:
    - python3
@@ -21,4 +21,6 @@
     python3 -m venv venv
     source venv/bin/activate
     for i in `cat /tmp/requirement.txt`; do pip install $i; done
-    zip -r /tmp/venv.zip /tmp/asg2_virtualenv/venv/
+
+- name: Packaging the python dependencies
+  shell: zip -r /tmp/venv.zip /tmp/asg2_virtualenv/venv/

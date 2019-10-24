@@ -48,9 +48,9 @@ https://docs.python.org/3/tutorial/venv.html
 ```
 
 ### Solution
-
+Ansible Role - setup-python-venv performs the above given task
 
 #### Ansible Command to execute Playbook
 ```
-
+ansible-playbook -i hosts site.yml
 ```
