@@ -4,4 +4,3 @@
   roles:
       - setup-hadoop
       - setup-service-handler
-  gather_facts: no
