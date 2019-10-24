@@ -6,6 +6,7 @@
   with_items:
    - python3
    - python3-pip
+   - zip
 
 - name: Install Python Virtual Enviornment Package
   shell: pip3 install virtualenv
@@ -17,6 +18,7 @@
   shell: |
     mkdir /tmp/asg2_virtualenv
     cd /tmp/asg2_virtualenv
-    virtualenv venv
+    python3 -m venv venv
     source venv/bin/activate
     for i in `cat /tmp/requirement.txt`; do pip install $i; done
+    zip -r /tmp/venv.zip /tmp/asg2_virtualenv/venv/
